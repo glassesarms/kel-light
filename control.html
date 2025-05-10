@@ -59,8 +59,16 @@
 
     #response {
       font-size: 0.9rem;
-      opacity: 0.3;
+      opacity: 0.2;
     }
+
+    .status-holder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
   </style>
 </head>
 <body>
@@ -70,7 +78,7 @@
     <button onclick="setStatus(true)">In Session</button>
     <button onclick="setStatus(false)">Available</button>
   </div>
-  <div>
+  <div class="status-holder">
     <div id="statusBar"></div>
     <p id="response"></p>
   </div>
