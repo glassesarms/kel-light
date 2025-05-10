@@ -15,16 +15,20 @@
   <p id="response" style="margin-top:2rem;"></p>
 
   <script>
-    async function setStatus(inSession) {
-      const res = await fetch('/.netlify/functions/set-session-status', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ in_session: inSession })
-      });
+async function setStatus(inSession) {
+  const response = await fetch("https://api.jsonbin.io/v3/b/681f40968960c979a596abb9", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Master-Key": "$2a$10$6wPrJLY9yrECPc/PLkqzUOkTup2vSgFJTYqSN3xMz/5HHvm6sFqVC"
+    },
+    body: JSON.stringify({ in_session: inSession })
+  });
 
-      const data = await res.json();
-      document.getElementById("response").innerText = `Set to: ${data.status.in_session ? "IN SESSION" : "AVAILABLE"}`;
-    }
+  const result = await response.json();
+  document.getElementById("response").innerText = `Set to: ${inSession ? "IN SESSION" : "AVAILABLE"}`;
+}
+
   </script>
 </body>
 </html>

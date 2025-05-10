@@ -1,14 +1,17 @@
-let currentStatus = { in_session: true };
+const fs = require("fs");
+const path = require("path");
 
-exports.handler = async function (event, context) {
+const filePath = path.resolve(__dirname, "../session.json");
+
+exports.handler = async function (event) {
   if (event.httpMethod === "POST") {
     try {
       const body = JSON.parse(event.body);
       if (typeof body.in_session === "boolean") {
-        currentStatus.in_session = body.in_session;
+        fs.writeFileSync(filePath, JSON.stringify({ in_session: body.in_session }));
         return {
           statusCode: 200,
-          body: JSON.stringify({ success: true, status: currentStatus }),
+          body: JSON.stringify({ success: true, in_session: body.in_session }),
         };
       }
     } catch (err) {
@@ -16,11 +19,5 @@ exports.handler = async function (event, context) {
     }
   }
 
-  return {
-    statusCode: 405,
-    body: "Method Not Allowed",
-  };
+  return { statusCode: 405, body: "Method Not Allowed" };
 };
-
-// export a getter too (optional reuse)
-exports.getStatus = () => currentStatus;
