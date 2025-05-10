@@ -69,26 +69,88 @@
       justify-content: center;
     }
 
+    #loginForm {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    input {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: none;
+      background-color: #222;
+      color: white;
+    }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 <body>
   <h1>Kel's Light</h1>
 
-  <div class="button-row">
-    <button onclick="setStatus(true)">In Session</button>
-    <button onclick="setStatus(false)">Available</button>
-  </div>
-  <div class="status-holder">
-    <div id="statusBar"></div>
-    <p id="response"></p>
+  <div id="loginSection">
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Log In</button>
+    </form>
   </div>
 
+  <div id="mainUI" style="display:none">
+    <div class="button-row">
+      <button onclick="setStatus(true)">In Session</button>
+      <button onclick="setStatus(false)">Available</button>
+    </div>
+    <div class="status-holder">
+      <div id="statusBar"></div>
+      <p id="response"></p>
+    </div>
+    <button onclick="logout()">Log Out</button>
+  </div>
 
   <script>
-    const dbUrl = "https://therapy-light-7ed71-default-rtdb.asia-southeast1.firebasedatabase.app/session/in_session.json";
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    const dbUrl = firebaseConfig.databaseURL + "/session/in_session.json";
+
+    const loginForm = document.getElementById("loginForm");
+    const loginSection = document.getElementById("loginSection");
+    const mainUI = document.getElementById("mainUI");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        await firebase.auth().signInWithEmailAndPassword(email, password);
+      } catch (err) {
+        alert("Login failed: " + err.message);
+      }
+    });
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        loginSection.style.display = "none";
+        mainUI.style.display = "flex";
+        fetchStatus();
+      } else {
+        loginSection.style.display = "flex";
+        mainUI.style.display = "none";
+      }
+    });
 
     async function setStatus(inSession) {
-      await fetch(dbUrl, {
+      const token = await firebase.auth().currentUser.getIdToken();
+      await fetch(dbUrl + "?auth=" + token, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(inSession)
@@ -96,27 +158,28 @@
       updateStatusUI(inSession);
     }
 
+    async function fetchStatus() {
+      const token = await firebase.auth().currentUser.getIdToken();
+      const res = await fetch(dbUrl + "?auth=" + token);
+      const data = await res.json();
+      updateStatusUI(data);
+    }
+
     function updateStatusUI(inSession) {
       const bar = document.getElementById("statusBar");
       const response = document.getElementById("response");
-
       if (inSession) {
-        bar.style.backgroundColor = "#aa2e2e"; // red
+        bar.style.backgroundColor = "#aa2e2e";
         response.innerText = "Current Status: In Session";
       } else {
-        bar.style.backgroundColor = "#2eaa59"; // green
+        bar.style.backgroundColor = "#2eaa59";
         response.innerText = "Current Status: Available";
       }
     }
 
-    fetch(dbUrl)
-      .then(res => res.json())
-      .then(data => {
-        updateStatusUI(data);
-      })
-      .catch(() => {
-        document.getElementById("response").innerText = "Failed to load status.";
-      });
+    function logout() {
+      firebase.auth().signOut();
+    }
   </script>
 </body>
 </html>
