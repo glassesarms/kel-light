@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Session Status Control</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 4rem; }
+    button { font-size: 1.5rem; margin: 1rem; padding: 1rem 2rem; }
+  </style>
+</head>
+<body>
+  <h1>Set Therapy Room Status</h1>
+  <button onclick="setStatus(true)">🔴 In Session</button>
+  <button onclick="setStatus(false)">🟢 Available</button>
+  <p id="response" style="margin-top:2rem;"></p>
+
+  <script>
+    async function setStatus(inSession) {
+      const res = await fetch('/.netlify/functions/set-session-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ in_session: inSession })
+      });
+
+      const data = await res.json();
+      document.getElementById("response").innerText = `Set to: ${data.status.in_session ? "IN SESSION" : "AVAILABLE"}`;
+    }
+  </script>
+</body>
+</html>
