@@ -70,9 +70,11 @@
     <button onclick="setStatus(true)">In Session</button>
     <button onclick="setStatus(false)">Available</button>
   </div>
+  <div>
+    <div id="statusBar"></div>
+    <p id="response"></p>
+  </div>
 
-  <div id="statusBar"></div>
-  <p id="response"></p>
 
   <script>
     async function setStatus(inSession) {
