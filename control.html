@@ -85,15 +85,14 @@
 
 
   <script>
+    const dbUrl = "https://therapy-light-7ed71-default-rtdb.asia-southeast1.firebasedatabase.app/session/in_session.json";
+
     async function setStatus(inSession) {
-      await fetch("https://your-project.firebaseio.com/session/in_session.json", {
+      await fetch(dbUrl, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(inSession)
       });
-
       updateStatusUI(inSession);
     }
 
@@ -102,23 +101,22 @@
       const response = document.getElementById("response");
 
       if (inSession) {
-        bar.style.backgroundColor = "#aa2e2e";
+        bar.style.backgroundColor = "#aa2e2e"; // red
         response.innerText = "Current Status: In Session";
       } else {
-        bar.style.backgroundColor = "#2eaa59";
+        bar.style.backgroundColor = "#2eaa59"; // green
         response.innerText = "Current Status: Available";
       }
     }
 
-    fetch("https://api.jsonbin.io/v3/b/681f40968960c979a596abb9/latest", {
-      headers: {
-        "X-Master-Key": "$2a$10$6wPrJLY9yrECPc/PLkqzUOkTup2vSgFJTYqSN3xMz/5HHvm6sFqVC"
-      }
-    })
-    .then(res => res.json())
-    .then(data => {
-      updateStatusUI(data.record.in_session);
-    });
+    fetch(dbUrl)
+      .then(res => res.json())
+      .then(data => {
+        updateStatusUI(data);
+      })
+      .catch(() => {
+        document.getElementById("response").innerText = "Failed to load status.";
+      });
   </script>
 </body>
 </html>
