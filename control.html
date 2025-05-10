@@ -28,9 +28,14 @@
       margin: 0;
     }
 
+    .button-row {
+      display: flex;
+      gap: 1.5rem;
+    }
+
     button {
       padding: 1rem 2rem;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: 500;
       border: none;
       border-radius: 6px;
@@ -44,25 +49,29 @@
       background-color: #333;
     }
 
-    .button-row {
-      display: flex;
-      gap: 1.5rem;
+    #statusBar {
+      width: 140px;
+      height: 16px;
+      border-radius: 4px;
+      background-color: #333;
+      transition: background-color 0.3s ease;
     }
 
     #response {
-      font-size: 1rem;
-      opacity: 0.75;
+      font-size: 0.9rem;
+      opacity: 0.7;
     }
   </style>
 </head>
 <body>
-  <h1>Therapy Room Light</h1>
+  <h1>Kel's Light</h1>
 
   <div class="button-row">
-    <button onclick="setStatus(true)">🔴 In Session</button>
-    <button onclick="setStatus(false)">🟢 Available</button>
+    <button onclick="setStatus(true)">In Session</button>
+    <button onclick="setStatus(false)">Available</button>
   </div>
 
+  <div id="statusBar"></div>
   <p id="response"></p>
 
   <script>
@@ -77,9 +86,31 @@
       });
 
       const data = await res.json();
-      document.getElementById("response").innerText =
-        `Status set to: ${inSession ? "🔴 In Session" : "🟢 Available"}`;
+      updateStatusUI(inSession);
     }
+
+    function updateStatusUI(inSession) {
+      const bar = document.getElementById("statusBar");
+      const response = document.getElementById("response");
+
+      if (inSession) {
+        bar.style.backgroundColor = "#aa2e2e";
+        response.innerText = "Current Status: In Session";
+      } else {
+        bar.style.backgroundColor = "#2eaa59";
+        response.innerText = "Current Status: Available";
+      }
+    }
+
+    fetch("https://api.jsonbin.io/v3/b/681f40968960c979a596abb9/latest", {
+      headers: {
+        "X-Master-Key": "$2a$10$6wPrJLY9yrECPc/PLkqzUOkTup2vSgFJTYqSN3xMz/5HHvm6sFqVC"
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      updateStatusUI(data.record.in_session);
+    });
   </script>
 </body>
 </html>
