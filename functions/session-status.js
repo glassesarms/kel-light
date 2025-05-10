@@ -4,6 +4,6 @@ exports.handler = async function(event, context) {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ in_session: true }) // Or false
+    body: JSON.stringify({ in_session: false }) // Or false
   };
 };
