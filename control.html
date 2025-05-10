@@ -86,16 +86,14 @@
 
   <script>
     async function setStatus(inSession) {
-      const res = await fetch("https://api.jsonbin.io/v3/b/681f40968960c979a596abb9", {
+      await fetch("https://your-project.firebaseio.com/session/in_session.json", {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
-          "X-Master-Key": "$2a$10$6wPrJLY9yrECPc/PLkqzUOkTup2vSgFJTYqSN3xMz/5HHvm6sFqVC"
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({ in_session: inSession })
+        body: JSON.stringify(inSession)
       });
 
-      const data = await res.json();
       updateStatusUI(inSession);
     }
 
